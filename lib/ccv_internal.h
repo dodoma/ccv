@@ -204,6 +204,13 @@ static int _CCV_PRINT_LOOP __attribute__ ((unused)) = 0;
 	case CCV_64F: { block(__VA_ARGS__, _ccv_get_64f_value); break; } \
 	default: { assert((type & CCV_32F) || (type & CCV_64F)); } } }
 
+#define ccv_matrix_format(type, block, ...) { switch (CCV_GET_DATA_TYPE(type)) { \
+	case CCV_32S: { block(__VA_ARGS__, "%d"); break; } \
+	case CCV_32F: { block(__VA_ARGS__, "%f"); break; } \
+	case CCV_64S: { block(__VA_ARGS__, "%ld"); break; } \
+	case CCV_64F: { block(__VA_ARGS__, "%lf"); break; } \
+	default: { block(__VA_ARGS__, "%d"); } } }
+
 #define ccv_matrix_typeof(type, block, ...) { switch (CCV_GET_DATA_TYPE(type)) { \
 	case CCV_32S: { block(__VA_ARGS__, int); break; } \
 	case CCV_32F: { block(__VA_ARGS__, float); break; } \

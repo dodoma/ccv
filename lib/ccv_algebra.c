@@ -6,9 +6,42 @@
 #include <cblas.h>
 #endif
 
-double ccv_trace(ccv_matrix_t* mat)
+double ccv_trace(ccv_matrix_t* mat, const char *filename)
 {
-	return 0;
+    FILE *fp = fopen(filename, "w");
+
+    ccv_dense_matrix_t *da = ccv_get_dense_matrix(mat);
+    if (!da) return 0;
+
+    if (fp) {
+        fprintf(fp, "type %x, step %d, in %d x %d size\n",
+                da->type, da->step, da->rows, da->cols);
+
+        int i, j, k, ch = CCV_GET_CHANNEL(da->type);
+        unsigned char *aptr = da->data.u8;
+
+#define for_block(_format, _for_get)                                    \
+        for (i = 0; i < da->rows; i++)                                  \
+        {                                                               \
+            for (j = 0; j < da->cols; j++)                              \
+            {                                                           \
+                fprintf(fp, " ");                                       \
+                for (k = 0; k < ch; k++)                                \
+                {                                                       \
+                    if (ch > 1) fprintf(fp, ",");                       \
+                    fprintf(fp, _format, _for_get(aptr, j * ch + k, 0)); \
+                }                                                       \
+            }                                                           \
+            fprintf(fp, "\n");                                          \
+            aptr += da->step;                                           \
+        }
+        ccv_matrix_format(da->type, ccv_matrix_getter, da->type, for_block);
+#undef for_block
+
+        fclose(fp);
+    }
+
+        return 0;
 }
 
 double ccv_norm(ccv_matrix_t* mat, int type)
